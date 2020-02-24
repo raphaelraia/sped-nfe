@@ -3,17 +3,18 @@
 namespace NFePHP\NFe\Factories;
 
 use NFePHP\Common\Strings;
-use NFePHP\NFe\Factories\Contingency;
 use NFePHP\Common\Signer;
 use NFePHP\Common\Keys;
+use NFePHP\Common\TimeZoneByUF;
 use NFePHP\Common\UFList;
 use DateTime;
 
 class ContingencyNFe
 {
     /**
-     * Corret NFe fields when in contingency mode
+     * Corrects NFe fields when in contingency mode
      * @param string $xml NFe xml content
+     * @param Contingency $contingency
      * @return string
      */
     public static function adjust($xml, Contingency $contingency)
@@ -27,7 +28,7 @@ class ContingencyNFe
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = false;
         $dom->loadXML($xml);
-        
+
         $ide = $dom->getElementsByTagName('ide')->item(0);
         $cUF = $ide->getElementsByTagName('cUF')->item(0)->nodeValue;
         $cNF = $ide->getElementsByTagName('cNF')->item(0)->nodeValue;
@@ -39,10 +40,16 @@ class ContingencyNFe
         $mes = $dtEmi->format('m');
         $tpEmis = (string) $contingency->tpEmis;
         $emit = $dom->getElementsByTagName('emit')->item(0);
-        $cnpj = $emit->getElementsByTagName('CNPJ')->item(0)->nodeValue;
+        if (!empty($emit->getElementsByTagName('CNPJ')->item(0)->nodeValue)) {
+            $doc = $emit->getElementsByTagName('CNPJ')->item(0)->nodeValue;
+        } else {
+            $doc = $emit->getElementsByTagName('CPF')->item(0)->nodeValue;
+        }
+        $motivo = trim(Strings::replaceUnacceptableCharacters($contingency->motive));
         
-        $motivo = trim(Strings::replaceSpecialsChars($contingency->motive));
-        $dt = new DateTime();
+        $tz = TimeZoneByUF::get(UFList::getUFByCode($cUF));
+        $dt = new \DateTime(date(), new \DateTimeZone($tz));
+        
         $dt->setTimestamp($contingency->timestamp);
         $ide->getElementsByTagName('tpEmis')
             ->item(0)
@@ -67,7 +74,7 @@ class ContingencyNFe
             $cUF,
             $ano,
             $mes,
-            $cnpj,
+            $doc,
             $mod,
             $serie,
             $nNF,

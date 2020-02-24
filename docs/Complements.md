@@ -16,7 +16,7 @@ E também permite a *"marcação"* de NFe como cancelada, **este não é um requ
 
 ### toAuthorize($request, $response):string
 
-Este método realiza a junção do protocolo de autorização com a requeiição original, criando um documentos VÁLIDO.
+Este método realiza a junção do protocolo de autorização com a requisição original, criando um documento VÁLIDO. Este método é utilizado para notas Aprovadas e Denegadas.
 
 Escopo: Publico
 
@@ -45,8 +45,8 @@ Retorna: String
 
 use NFePHP\NFe\Complements;
 
-$request = "<XML conteudo original do documento que quer protocolar>";
-$response = "<XML conteudo do retorno com a resposta da SEFAZ>";
+$req = "<XML conteudo original do documento que quer protocolar>";
+$res = "<XML conteudo do retorno com a resposta da SEFAZ>";
 
 try {
     $xml = Complements::toAuthorize($req, $res);
@@ -78,8 +78,8 @@ Retorna: String
 
 use NFePHP\NFe\Complements;
 
-$request = "<XML conteudo original do documento que quer protocolar>";
-$response = "<XML conteudo do retorno com a resposta da SEFAZ>";
+$req = "<XML conteudo original do documento que quer protocolar>";
+$res = "<XML conteudo do retorno com a resposta da SEFAZ>";
 
 try {
     $xml = Complements::toAuthorize($req, $res);

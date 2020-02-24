@@ -17,8 +17,8 @@ $arr = [
     "razaosocial" => "SUA RAZAO SOCIAL LTDA",
     "cnpj" => "99999999999999",
     "siglaUF" => "SP",
-    "schemes" => "PL008i2",
-    "versao" => '3.10',
+    "schemes" => "PL_009_V4",
+    "versao" => '4.00',
     "tokenIBPT" => "AAAAAAA",
     "CSC" => "GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G",
     "CSCid" => "000001",
@@ -45,7 +45,7 @@ $tools->model('55');
 //desativada pelo usuário, essa informação não é persistida automaticamente e depende 
 //de ser gravada pelo ERP
 //NOTA: esse retorno da função é um JSON
-$contingencia = $tools->contingeny->activate('SP', 'Teste apenas');
+$contingencia = $tools->contingency->activate('SP', 'Teste apenas');
 
 //e se necessário carregada novamente quando a classe for instanciada,
 //obtendo a string da contingência em json e passando para a classe

@@ -122,7 +122,9 @@ class Complements
                 ->item(0)
                 ->nodeValue;
             if (in_array($cStat, ['135', '136', '155'])
-                && $tpEvento == '110111'
+                && ($tpEvento == Tools::EVT_CANCELA
+                    || $tpEvento == Tools::EVT_CANCELASUBSTITUICAO
+                )
                 && $chaveEvento == $chaveNFe
             ) {
                 $proNFe->getElementsByTagName('cStat')
@@ -237,14 +239,14 @@ class Complements
         $ret->preserveWhiteSpace = false;
         $ret->formatOutput = false;
         $ret->loadXML($response);
-        $retProt = $ret->getElementsByTagName('protNFe');
-        if (!isset($retProt)) {
+        $retProt = !empty($ret->getElementsByTagName('protNFe')) ? $ret->getElementsByTagName('protNFe') : null;
+        if ($retProt === null) {
             throw DocumentsException::wrongDocument(3, "&lt;protNFe&gt;");
         }
         $digProt = '000';
         foreach ($retProt as $rp) {
             $infProt = $rp->getElementsByTagName('infProt')->item(0);
-            $cStat  = $infProt->getElementsByTagName('cStat')->item(0)->nodeValue;
+            $cStat = $infProt->getElementsByTagName('cStat')->item(0)->nodeValue;
             $xMotivo = $infProt->getElementsByTagName('xMotivo')->item(0)->nodeValue;
             $dig = $infProt->getElementsByTagName("digVal")->item(0);
             $key = $infProt->getElementsByTagName("chNFe")->item(0)->nodeValue;
@@ -257,7 +259,8 @@ class Complements
                     //205 NFe Denegada
                     //301 Uso denegado por irregularidade fiscal do emitente
                     //302 Uso denegado por irregularidade fiscal do destinatário
-                    $cstatpermit = ['100', '150', '110', '205', '301','302'];
+                    //303 Uso Denegado Destinatario nao habilitado a operar na UF
+                    $cstatpermit = ['100', '150', '110', '205', '301', '302', '303'];
                     if (!in_array($cStat, $cstatpermit)) {
                         throw DocumentsException::wrongDocument(4, "[$cStat] $xMotivo");
                     }
@@ -307,7 +310,7 @@ class Complements
         $xMotivo = $retEv->getElementsByTagName('xMotivo')->item(0)->nodeValue;
         $tpEvento = $retEv->getElementsByTagName('tpEvento')->item(0)->nodeValue;
         $cStatValids = ['135', '136'];
-        if ($tpEvento == '110111') {
+        if ($tpEvento == Tools::EVT_CANCELA) {
             $cStatValids[] = '155';
         }
         if (!in_array($cStat, $cStatValids)) {
