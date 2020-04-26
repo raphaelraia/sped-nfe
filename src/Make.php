@@ -929,20 +929,23 @@ class Make
         $std = $this->equilizeParameters($std, $possible);
         $identificador = 'C01 <emit> - ';
         $this->emit = $this->dom->createElement("emit");
-        $this->dom->addChild(
-            $this->emit,
-            "CNPJ",
-            Strings::onlyNumbers($std->CNPJ),
-            false,
-            $identificador . "CNPJ do emitente"
-        );
-        $this->dom->addChild(
-            $this->emit,
-            "CPF",
-            Strings::onlyNumbers($std->CPF),
-            false,
-            $identificador . "CPF do remetente"
-        );
+        if (!empty($std->CNPJ)) {
+            $this->dom->addChild(
+                $this->emit,
+                "CNPJ",
+                Strings::onlyNumbers($std->CNPJ),
+                false,
+                $identificador . "CNPJ do emitente"
+            );
+        } elseif (!empty($std->CPF)) {
+            $this->dom->addChild(
+                $this->emit,
+                "CPF",
+                Strings::onlyNumbers($std->CPF),
+                false,
+                $identificador . "CPF do remetente"
+            );
+        }
         $this->dom->addChild(
             $this->emit,
             "xNome",
@@ -981,13 +984,15 @@ class Make
             false,
             $identificador . "Inscrição Municipal do Prestador de Serviço do emitente"
         );
-        $this->dom->addChild(
-            $this->emit,
-            "CNAE",
-            Strings::onlyNumbers($std->CNAE),
-            false,
-            $identificador . "CNAE fiscal do emitente"
-        );
+        if (!empty($std->IM) && !empty($std->CNAE)) {
+            $this->dom->addChild(
+                $this->emit,
+                "CNAE",
+                Strings::onlyNumbers($std->CNAE),
+                false,
+                $identificador . "CNAE fiscal do emitente"
+            );
+        }
         $this->dom->addChild(
             $this->emit,
             "CRT",
@@ -4751,8 +4756,6 @@ class Make
             'vUnid'
         ];
         $std = $this->equilizeParameters($std, $possible);
-        //totalizador
-        $this->stdTot->vIPI += (float) $std->vIPI;
         $ipi = $this->dom->createElement('IPI');
         $this->dom->addChild(
             $ipi,
@@ -4791,6 +4794,8 @@ class Make
             "[item $std->item] Código de Enquadramento Legal do IPI"
         );
         if ($std->CST == '00' || $std->CST == '49' || $std->CST == '50' || $std->CST == '99') {
+            //totalizador
+            $this->stdTot->vIPI += (float) $std->vIPI;
             $ipiTrib = $this->dom->createElement('IPITrib');
             $this->dom->addChild(
                 $ipiTrib,
